@@ -4,7 +4,7 @@ library(dplyr)
 library(tidyr)
 
 # Read in data
-sp <- readRDS("./data/Species numbers for plotting.RDS")
+sp <- readRDS("./Data/Species numbers for plotting.RDS")
 sp <- sp[!sp %in% c(6, 9, 26, 23)]
 length(unique(sp))
 
@@ -14,7 +14,7 @@ sp.info <- readRDS("./data/Species info for plotting.RDS")
 sp.info <- subset(sp.info, !sp.info$sp.name %in% c("TSUCAN", "QUERUB", "CORALT", "AMELAE"))
 n.sp <- length(unique(sp.info$sp.name))
 
-load("./data/ForestGEO_Wabikon_Legacy_CDD_LogisticSurvival_cdd_matrices_20231110.RData")
+load("./data/Average posterior comparison/common exponents/ForestGEO_Wabikon_Legacy_CDD_LogisticSurvival_cdd_matrices_20231110.RData")
 
 # Calculations
 realLivingCDD.spAPC <- apply(realLivingCDD.sp, 2, mean)
@@ -53,7 +53,7 @@ fig2 <- ggplot(df1, aes(x = middle, y = group)) +
     legend.position = "none"
   )
 
-ggsave(fig2, file = "./manuscript/figure2.jpg", width = 6, height = 4)
+# ggsave(fig2, file = "./Figures/figure2.jpg", width = 6, height = 4)
 
 # ... Previous code blocks ...
 
@@ -137,5 +137,5 @@ fixed_effects_plot <- ggplot(beta.comp, aes(x = med, y = beta)) +
   labs(x = "Standardized parameter estimates", y = NULL) +
   theme_bw()
 
-# ggsave(filename = "./manuscript/fixed effects all.jpg", width = 82, height = 82, units = 'mm')
+# ggsave(filename = "./Figures/fixed effects all.jpg", width = 82, height = 82, units = 'mm')
 

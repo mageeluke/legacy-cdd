@@ -25,8 +25,9 @@ options(mc.cores = parallel::detectCores())
 library(DHARMa)
 
 
-## read in data (from data prep code)
-dat3 <- readRDS("./data/Data.legacy_effects_alpha0-6_beta1-1.rds")
+## read in data (from data prep code)  --again we provide a subset here from the preparation script
+dat3 <- readRDS("./Data/subset_wabikon_neigbhors.RDS")
+# dat3 <- readRDS("./data/Data.legacy_effects_alpha0-6_beta1-1.rds")
 
 ## Remove species with not enough records 
 dat4 <- subset(dat3, dat3$sp !="AMESAN" & dat3$sp !="AME sp." & dat3$sp !="ILEMUC" & dat3$sp !="MALPUM" & dat3$sp !="PINSTR"
@@ -57,7 +58,6 @@ for(i in 1:length(dlist)) {				# loop to keep largest alive stem for each indivi
   dlist[[i]] = test
 }
 dat5 = do.call('rbind', dlist)
-
 
 
 ### IN ADDITION MAKE SURE THESE RData FILES ARE IN R WORKING DIRECTORY:
@@ -153,27 +153,27 @@ its = postburn + burnin			# Total number of samples to be drawn from posterior
 thin = 10					# Rate at which to thin the posterior samples		
 hmc_seed = 55406				# HMC seed for reproducibility
 
-# Initial values from LMER model
-vc <- VarCorr(m1)
-sigma_SB_lmer = as.matrix(Matrix::bdiag(vc$sp))
-inits <- replicate(nchains, list(
-  Sz = t(data.matrix(ranef(m1)$'sp')),
-  SL_Omega = sigma_SB_lmer,
-  Stau_unif = runif(SK),
-  beta = fixef(m1),
-  sigma_QUAD = attr(summary(m1)$varcor$plotnum,"stddev")[[1]],
-  QUAD = ranef(m1)$'plotnum'[[1]], 
-  SB = data.matrix(ranef(m1)$'sp'), 
-  sigma_SB = sigma_SB_lmer, 
-  Stau = runif(SK)
-), simplify = F)
+# Initial values from LMER model  -- not required but can be helpful 
+# vc <- VarCorr(m1)
+# sigma_SB_lmer = as.matrix(Matrix::bdiag(vc$sp))
+# inits <- replicate(nchains, list(
+#   Sz = t(data.matrix(ranef(m1)$'sp')),
+#   SL_Omega = sigma_SB_lmer,
+#   Stau_unif = runif(SK),
+#   beta = fixef(m1),
+#   sigma_QUAD = attr(summary(m1)$varcor$plotnum,"stddev")[[1]],
+#   QUAD = ranef(m1)$'plotnum'[[1]], 
+#   SB = data.matrix(ranef(m1)$'sp'), 
+#   sigma_SB = sigma_SB_lmer, 
+#   Stau = runif(SK)
+# ), simplify = F)
 
 
 # Run model
 begin = Sys.time()
-fit <- stan(file = "./data/ForestGEO_LogisticSurvival_Model_STAN.stan", 		# Stan model
+fit <- stan(file = "./source/ForestGEO_LogisticSurvival_Model_STAN.stan", 		# Stan model
             data = dat,   										# named list of data
-            init = inits,										# initial values for parameters
+            # init = inits,										# initial values for parameters
             chains = nchains,             							# number of Markov chains
             warmup = burnin,          								# number of warmup iterations per chain
             iter = its,            								# total number of iterations per chain
@@ -185,9 +185,9 @@ fit <- stan(file = "./data/ForestGEO_LogisticSurvival_Model_STAN.stan", 		# Stan
 end = Sys.time()
 (duration = end - begin)
 
-#  save(fit, file = "./Data/ForestGEO_Wabikon_Legacy_CDD_LogisticSurvival_Bayesian_alpha0-6_beta1-1_exp0-30_STAN_20231109.RData")
+#  save(fit, file = "./Data/stan_output_test.RData")
 # 
-# load("./Data/ForestGEO_Wabikon_Legacy_CDD_LogisticSurvival_Bayesian_alpha0-6_beta1-1_exp0-30_STAN_20231109.RData")
+# load("./Data/stan_output_test.RData")
 
 median(fit@sim$samples)
 summary(fit)
