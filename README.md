@@ -24,7 +24,7 @@ Additional data:
 
 -   Source code and output are shown for grid searches for 6 and 12 neigbhorhood exponent models './source/grid searches', and "output" folders, respectively.
 
-# Systems and R packages (dependencies)
+# Systems and R packages 
 
 All analysis were conducted in R version 4.3.1
 
@@ -37,3 +37,11 @@ The analyses relied on the following R packages:
 -   lme4 (Version 1.1-34)
 
 -   DHARMa (Version 0.4.6)
+
+-   boot (Version 1.3-28.1)
+
+-   purrr (Version 1.0.2)
+
+-   data.table (Version 1.14.8)
+
+-   sp (Version 2.1-1)

@@ -539,4 +539,4 @@ realSurvLegacyConLo.sp = do.call('cbind', realSurvLegacyConLo.sp)
 realLivingCDD.sp = do.call('cbind', realLivingCDD.sp)
 realLegacyCDD.sp = do.call('cbind', realLegacyCDD.sp)
 
-#save(realSurvLivingConHi.sp, realSurvLivingConLo.sp, realSurvLegacyConHi.sp, realSurvLegacyConLo.sp, realLivingCDD.sp, realLegacyCDD.sp, sp.info2, file = "ForestGEO_Wabikon_Legacy_CDD_LogisticSurvival_cdd_matrices_20231110.RData")
+#save(realSurvLivingConHi.sp, realSurvLivingConLo.sp, realSurvLegacyConHi.sp, realSurvLegacyConLo.sp, realLivingCDD.sp, realLegacyCDD.sp, sp.info2, file = "ForestGEO_Wabikon_Legacy_CDD_LogisticSurvival_cdd_matrices_test.RData")

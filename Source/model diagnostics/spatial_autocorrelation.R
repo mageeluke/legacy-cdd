@@ -21,7 +21,7 @@ library(piecewiseSEM)
 source("./source/neighborhood_functional_forms_coefficeints_ljm.R")
 
 ## data 
-wab <- data.frame(readRDS("./data/wab_dat_growth_format_20220321.rds"))
+wab <- data.frame(readRDS("./data/wabikon_subset.RDS"))
 ##
 
 ## basal areas (m^2)
@@ -145,14 +145,16 @@ library(adespatial)
 
 dat4 = dat4[which(substr(dat4$quad,1,2) %in% c("00","14") == F & substr(dat4$quad,3,4) %in% c("00","41") == F),]
 
-# data_plt <- data.frame(
-  Cdens = dat4$Cdens,
-  Hdens = dat4$Hdens,
-  LCdens = dat4$LCdens,
-  LHdens = dat4$LHdens,
-  # total = dat4$Cdens + dat4$Hdens,
-  dbh = dat4$dbh
-)
+
+## plot the data 
+# # data_plt <- data.frame(
+#   Cdens = dat4$Cdens,
+#   Hdens = dat4$Hdens,
+#   LCdens = dat4$LCdens,
+#   LHdens = dat4$LHdens,
+#   # total = dat4$Cdens + dat4$Hdens,
+#   dbh = dat4$dbh
+# )
 
 
 
@@ -162,13 +164,13 @@ LCdens = dat4$LCdens
 LHdens = dat4$LHdens
 
 # Use GGally::ggpairs to create correlation plot
-plt <- GGally::ggcorr(data_plt2, label = TRUE, label_size = 4, label_color = "black", lower = TRUE)
-
-# Print the plot
-print(plt)
+# plt <- GGally::ggcorr(data_plt2, label = TRUE, label_size = 4, label_color = "black", lower = TRUE)
+# 
+# # Print the plot
+# print(plt)
 
 # Rotate the text labels on y-axis
-plt  + theme(axis.text.y = element_text(angle = 0, vjust = 0.5, hjust = 1))
+# plt  + theme(axis.text.y = element_text(angle = 0, vjust = 0.5, hjust = 1))
 
 #####
 conhetero = c(Cdens^(DenExp), Hdens^(DenExp), LCdens^(DenExp), LHdens^(DenExp)) # Collective mean across all living and legacy con- and heterospecific densities transformed with D = DenExp
@@ -203,17 +205,12 @@ fm_free1 <- lme4::glmer(surv ~ dbh.2 + conspp  + Lconspp + Lheterospp +
                        family = binomial, data = dat4, 
                        control = glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun = 2e6)))
 
-fm_check <- glm(surv ~ dbh + Cdens  + Hdens, family = "binomial", data = dat4)
 
-summary(fm_check)
+
 
 summary(fm_free)
-library(sjPlot)
 
-plot_model(fm_free, show.values = T, std.response = T )
-
-
-# [1] 30476.25
+## check variance inflation 
 library(car)
 vif(fm_free)
 
@@ -225,67 +222,75 @@ resi <- residuals(fm_free, type = "pearson")
 # Create spatial weights matrix
 W <- dnearneigh(d4[c("x", "y")], d1 = 1, d2 = 20)  ### 
 
-W_listw <- nb2listw(W, style = "W")
+## change zero.policy to true for data subset
+W_listw <- nb2listw(W, style = "W", zero.policy = T)  ## will get an error here with the subset
 
 # Perform Moran's I test
 moran_test_result <- moran.mc(resi, W_listw, nsim = 199)
 
+print(moran_test_result)
+
+
+
+
+## all below is additional code to check moran's at different spaital scales 
+
 # Store Moran's I statistic in the vector
-
-
-moran_results[i] <- moran_test_result$parameter
-moran_p[i] <- moran_test_result$p.value
-# }
-
-####
-
-# Assuming moran_results and moran_p are your vectors
-library(ggplot2)
-
-# Create a dataframe with the data
-df <- data.frame(moran_results = moran_results,
-                 moran_p = moran_p)
-
-# Create a scatter plot with lines connecting successive points
-ggplot(df, aes(x = grid_sizes , y =  moran_results)) +
-  geom_point() +
-  geom_line() +  # Add this line to connect successive points
-  labs(x = "Grid size (m^2)",
-       y = "Moran p-values",
-       title = "")
-
-
-
-
-
-# Assuming you have residuals in 'res' and coordinates in 'd4'
-ggplot(data = d4, aes(x = x, y = y, fill = resi)) +
-  geom_tile(width = 10, height = 10) +
-  labs(title = "Tile Plot of Residuals vs. Coordinates",
-       x = "X-coordinate",
-       y = "Y-coordinate",
-       fill = "Residuals") +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
-  theme_minimal()
-
-
-
-fm_nest <- lme4::glmer(surv ~ dbh.2 + conspp + heterospp + Lconspp + Lheterospp + 
-                         (1|sp),
-                       family = binomial, data = dat4, 
-                       control = glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun = 2e6)))
-
-d4 <- data.frame(dat4)
-d4$res <- residuals(fm_nest, type = "pearson")
-# Calculate residuals
-resi <- residuals(fm_nest, type = "pearson")
-
-# Create spatial weights matrix
-W <- dnearneigh(d4[c("x", "y")], d1 = .1, d2 = 20)  ### 
-
-W_listw <- nb2listw(W, style = "W")
-
-# Perform Moran's I test
-moran_test_result <- moran.mc(resi, W_listw, nsim = 499)
-
-
+# 
+# 
+# moran_results[i] <- moran_test_result$parameter
+# moran_p[i] <- moran_test_result$p.value
+# # }
+# 
+# ####
+# 
+# # Assuming moran_results and moran_p are your vectors
+# library(ggplot2)
+# 
+# # Create a dataframe with the data
+# df <- data.frame(moran_results = moran_results,
+#                  moran_p = moran_p)
+# 
+# # Create a scatter plot with lines connecting successive points
+# ggplot(df, aes(x = grid_sizes , y =  moran_results)) +
+#   geom_point() +
+#   geom_line() +  # Add this line to connect successive points
+#   labs(x = "Grid size (m^2)",
+#        y = "Moran p-values",
+#        title = "")
+# 
+# 
+# 
+# 
+# 
+# # Assuming you have residuals in 'res' and coordinates in 'd4'
+# ggplot(data = d4, aes(x = x, y = y, fill = resi)) +
+#   geom_tile(width = 10, height = 10) +
+#   labs(title = "Tile Plot of Residuals vs. Coordinates",
+#        x = "X-coordinate",
+#        y = "Y-coordinate",
+#        fill = "Residuals") +
+#   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+#   theme_minimal()
+# 
+# 
+# 
+# fm_nest <- lme4::glmer(surv ~ dbh.2 + conspp + heterospp + Lconspp + Lheterospp + 
+#                          (1|sp),
+#                        family = binomial, data = dat4, 
+#                        control = glmerControl(optimizer = 'bobyqa', optCtrl = list(maxfun = 2e6)))
+# 
+# d4 <- data.frame(dat4)
+# d4$res <- residuals(fm_nest, type = "pearson")
+# # Calculate residuals
+# resi <- residuals(fm_nest, type = "pearson")
+# 
+# # Create spatial weights matrix
+# W <- dnearneigh(d4[c("x", "y")], d1 = .1, d2 = 20)  ### 
+# 
+# W_listw <- nb2listw(W, style = "W")
+# 
+# # Perform Moran's I test
+# moran_test_result <- moran.mc(resi, W_listw, nsim = 499)
+# 
+# 
