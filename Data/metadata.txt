@@ -1,0 +1,16 @@
+stemID      Unique identifier for each stem in the dataset.
+tag         Tag identifier associated with each stem.
+quadrat_txt Quadrat identifier where the stem was measured.
+plotX       X-coordinate of the stem location.
+plotY       Y-coordinate of the stem location.
+spcode      Species code of the stem.
+status_08   Status of the stem in 2008.
+status_13   Status of the stem in 2013.
+status_18   Status of the stem in 2018.
+GAF         Growth assessment factor for the stem.
+dbh_08      Diameter at breast height in 2008 (mm).
+dbh_13      Diameter at breast height in 2013 (mm).
+dbh_18      Diameter at breast height in 2018 (mm).
+date_08     Date of measurement in 2008.
+date_13     Date of measurement in 2013.
+date_18     Date of measurement in 2018.

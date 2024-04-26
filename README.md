@@ -24,7 +24,7 @@ Additional data:
 
 -   Source code and output are shown for grid searches for 6 and 12 neigbhorhood exponent models './source/grid searches', and "output" folders, respectively.
 
-# Systems and R packages 
+# Systems and R packages
 
 All analysis were conducted in R version 4.3.1
 
